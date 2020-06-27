@@ -1,0 +1,22 @@
+[package]
+edition = '2018'
+name = "wiktitrage"
+version = "0.1.0"
+description = ""
+authors = [
+    "adjivas <adjivas@users.noreply.framagit.org>",
+]
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+repository = "https://framagit.org/adjivas/wiktitrage.git"
+homepage = "https://framagit.org/adjivas/wiktitrage"
+keywords = ["uml", "graph", "dot", "generator", "modeling-language"]
+categories = ["internationalization", "visualization"]
+
+[dependencies]
+reqwest = { version = "0.10", features = ["json"] }
+tokio = { version = "0.2", features = ["full"] }
+
+serde = "1.0"
+serde_derive = "1.0"
+url = "2.1"

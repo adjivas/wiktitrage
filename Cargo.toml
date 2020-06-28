@@ -20,3 +20,10 @@ tokio = { version = "0.2", features = ["full"] }
 serde = "1.0"
 serde_derive = "1.0"
 url = "2.1"
+
+glib = "^0"
+gio = "^0"
+gdk = "^0"
+gtk = "^0"
+pango = "^0"
+cairo-rs = { version = "^0" }

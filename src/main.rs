@@ -37,6 +37,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
     .expect("Initialization failed...");
 
+    let clipboard = gtk::Clipboard::get(&gdk::SELECTION_CLIPBOARD);
+    let t = clipboard.wait_for_text().unwrap();
+    println!("t {}", t);
+
+    let n = Screen::get_monitor_at_window();
+    println!("N: {}", n);
+
     let height = Screen::height();
     let style = format!("#label1 {{
                             color: white;
@@ -46,10 +53,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                           -{1}px  {1}px 0 black,
                                            {1}px  {1}px 0 black;
                         }}", height/17, height/500);
-
-    let clipboard = gtk::Clipboard::get(&gdk::SELECTION_CLIPBOARD);
-    let t = clipboard.wait_for_text().unwrap();
-    println!("t {}", t);
 
     // Extracting Etymological Information from Wiktionary --
     // https://stackoverflow.com/questions/52351081

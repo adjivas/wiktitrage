@@ -31,16 +31,6 @@ struct Wiki {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Extracting Etymological Information from Wiktionary --
-    // https://stackoverflow.com/questions/52351081
-    let url = Url::parse_with_params("https://fr.wiktionary.org/w/api.php?format=json&action=query&prop=extracts&explaintext&exlimit=1",
-                                     &[("titles", "bonjour")])?;
-    let resp = reqwest::get(url)
-        .await?
-        .json::<Wiki>()
-        .await?;
-    println!("{:?}", resp.query.pages.iter().next());
-
     let application = gtk::Application::new(
         Some("org.main_window"),
         gio::ApplicationFlags::empty()
@@ -55,7 +45,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                            {1}px -{1}px 0 black,
                                           -{1}px  {1}px 0 black,
                                            {1}px  {1}px 0 black;
-                        }}", height/15, height/500);
+                        }}", height/17, height/500);
+
+    let clipboard = gtk::Clipboard::get(&gdk::SELECTION_CLIPBOARD);
+    let t = clipboard.wait_for_text().unwrap();
+    println!("t {}", t);
+
+    // Extracting Etymological Information from Wiktionary --
+    // https://stackoverflow.com/questions/52351081
+    let url = Url::parse_with_params("https://fr.wiktionary.org/w/api.php?format=json&action=query&prop=extracts&explaintext&exlimit=1",
+                                     &[("titles", t)])?;
+    let resp = reqwest::get(url)
+        .await?
+        .json::<Wiki>()
+        .await?;
+    let mut text = String::new();
+    if let Some((_, Page { desc, .. })) = resp.query.pages.iter().next() {
+        if let Some(desc) = desc {
+            let wik = desc.split(|f| f == '\n')
+                                 .filter(|x| !x.is_empty())
+                                 .collect::<Vec<_>>();
+            let etym = wik.iter().skip_while(|&x| x == &"== Français ==")
+                                 .skip_while(|&x| x == &"=== Étymologie ===")
+                          .next();
+            if let Some(etym) = etym {
+                text.push_str(etym);
+            }
+        }
+    }
     application.connect_startup(move |app| {
         // The CSS "magic" happens here.
         let provider = gtk::CssProvider::new();
@@ -72,18 +89,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
 
         // We build the application UI.
-        build_ui(app);
+        build_ui(app, &text);
     });
-
-    let clipboard = gtk::Clipboard::get(&gdk::SELECTION_CLIPBOARD);
-    clipboard.request_text(|_, t| println!("{:?}", t));
 
     application.run(&args().collect::<Vec<_>>());
 
     Ok(())
 }
 
-fn build_ui(application: &gtk::Application) {
+fn build_ui(application: &gtk::Application, text: &str) {
     let window = ApplicationWindow::new(application);
     set_visual(&window, None);
 
@@ -96,7 +110,7 @@ fn build_ui(application: &gtk::Application) {
     // The container container.
     let vbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
 
-    let label = gtk::Label::new(Some("Some text"));
+    let label = gtk::Label::new(Some(text));
     gtk::WidgetExt::set_widget_name(&label, "label1");
 
     vbox.add(&label);
@@ -121,7 +135,7 @@ fn build_ui(application: &gtk::Application) {
     };
 
     // executes the closure once every second
-//    gtk::timeout_add_seconds(1, tick);
+    gtk::timeout_add_seconds(1, tick);
 }
 
 fn set_visual(window: &ApplicationWindow, _screen: Option<&gdk::Screen>) {

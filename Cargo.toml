@@ -1,7 +1,7 @@
 [package]
 edition = '2018'
 name = "wiktitrage"
-version = "0.1.0"
+version = "0.3.0"
 description = ""
 authors = [
     "adjivas <adjivas@users.noreply.framagit.org>",
@@ -17,6 +17,8 @@ categories = ["internationalization", "visualization"]
 reqwest = { version = "0.10", features = ["json"] }
 tokio = { version = "0.2", features = ["full"] }
 
+getopts = "0.2"
+
 serde = "1.0"
 serde_derive = "1.0"
 url = "2.1"
@@ -27,3 +29,7 @@ gdk = "^0"
 gtk = "^0"
 pango = "^0"
 cairo-rs = { version = "^0" }
+
+[[bin]]
+name = "wiktitrage"
+path = "src/wiktitrage.rs"

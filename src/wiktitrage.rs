@@ -153,14 +153,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let application = gtk::Application::new(
                 Some(APPLICATION_NAME),
                 gio::ApplicationFlags::empty()
-                )
-                .expect("Initialization failed...");
+            )
+            .expect("Initialization failed...");
 
+            // Todo: wait gtk init
             let clipboard = gtk::Clipboard::get(&gdk::SELECTION_CLIPBOARD);
             let text = clipboard.wait_for_text().expect("Clip wait for text failed");
-            let word = text.split_whitespace().next().unwrap()
-                .to_lowercase();
-            let wiks = Resp::new(&word).await?.next().unwrap();
+            let wiks = Resp::new(&text).await?.next().unwrap();
 
             clipboard.set_text(&wiks.first().unwrap().desc);
 

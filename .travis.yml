@@ -9,8 +9,6 @@ matrix:
       env: TARGET=x86_64-apple-darwin
       rust: nightly
     - os: osx
-      rust: stable
-    - os: osx
       rust: nightly
 addons:
   apt:

@@ -11,7 +11,7 @@ use gio::prelude::*;
 use gtk::prelude::*;
 use gtk::ApplicationWindow;
 use gtk::Justification;
-use gdk::enums::key;
+use gdk::keys::constants;
 use glib::clone;
 
 pub mod style;
@@ -65,7 +65,7 @@ fn build_ui(application: &gtk::Application, wiks: Vec<Wik>) {
                                           @default-return Inhibit(false),
                                             move |win, event| {
         match event.get_keyval(){
-            key::Return => {
+            constants::Return => {
                 let mut r_time = r_time.clone();
                 let mut r_wik = rc_wik.clone();
                 let it_wik = unsafe { Rc::get_mut_unchecked(&mut r_wik) };

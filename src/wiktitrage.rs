@@ -70,12 +70,11 @@ fn build_ui(application: &gtk::Application, wiks: Vec<Wik>) {
                 let it_wik = unsafe { Rc::get_mut_unchecked(&mut r_wik) };
                 let time = unsafe { Rc::get_mut_unchecked(&mut r_time) };
                 *time = APPLICATION_TIMER;
-                it_wik.next().map(|w| {
-                    let text = w.desc;
+                if let Some (Wik { desc: text, .. }) = it_wik.next() {
                     let clip = gtk::Clipboard::get(&gdk::SELECTION_CLIPBOARD);
                     clip.set_text(&text);
                     label.set_text(&text);
-                });
+                }
                 Inhibit(true)
             }
             _ => {

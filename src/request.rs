@@ -86,8 +86,12 @@ impl Resp {
             it: resp.query.pages.into_iter(),
         })
     }
+}
 
-    pub fn next(&mut self) -> Option<Vec<Wik>> {
+impl Iterator for Resp {
+    type Item = Vec<Wik>;
+
+    fn next(&mut self) -> Option<Self::Item> {
         if let Some((_, page)) = self.it.next() {
             page.get_line()
         } else {

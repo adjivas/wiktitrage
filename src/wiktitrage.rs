@@ -1,5 +1,4 @@
 #![crate_type = "bin"]
-#![feature(linked_list_cursors)]
 #![feature(get_mut_unchecked)]
 
 use std::env;
@@ -71,11 +70,12 @@ fn build_ui(application: &gtk::Application, wiks: Vec<Wik>) {
                 let it_wik = unsafe { Rc::get_mut_unchecked(&mut r_wik) };
                 let time = unsafe { Rc::get_mut_unchecked(&mut r_time) };
                 *time = APPLICATION_TIMER;
-                if let Some(text) = it_wik.next().and_then(|w| Some(w.desc)) {
+                it_wik.next().map(|w| {
+                    let text = w.desc;
                     let clip = gtk::Clipboard::get(&gdk::SELECTION_CLIPBOARD);
                     clip.set_text(&text);
                     label.set_text(&text);
-                }
+                });
                 Inhibit(true)
             }
             _ => {
@@ -149,6 +149,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("{} {}", env!("CARGO_PKG_NAME"),
                               env!("CARGO_PKG_VERSION"));
         }
+        // TODO: add default arg b/height
         Ok(_) => {
             let application = gtk::Application::new(
                 Some(APPLICATION_NAME),
@@ -156,7 +157,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             )
             .expect("Initialization failed...");
 
-            // Todo: wait gtk init
+            // TODO: wait gtk init
             let clipboard = gtk::Clipboard::get(&gdk::SELECTION_CLIPBOARD);
             let text = clipboard.wait_for_text().expect("Clip wait for text failed");
             let wiks = Resp::new(&text).await?.next().unwrap();
@@ -167,8 +168,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             // https://stackoverflow.com/questions/52351081
             application.connect_startup(move |app| {
                 // The CSS "magic" happens here.
+                let css = style::get_style()
+                    .unwrap_or_else(|_| String::from(style::APPLICATION_STYLE));
                 let provider = gtk::CssProvider::new();
-                let css = style::get_style().unwrap_or(String::from(style::APPLICATION_STYLE));
+
                 provider
                     .load_from_data(css.as_bytes())
                     .expect("Failed to load CSS");

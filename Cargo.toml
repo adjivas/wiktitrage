@@ -2,7 +2,7 @@
 edition = '2018'
 name = "wiktitrage"
 version = "0.3.0"
-description = ""
+description = "A GTK program shows the wiktionary's etymology of a selected word in an interactive subtitle"
 authors = [
     "adjivas <adjivas@users.noreply.framagit.org>",
 ]
@@ -10,7 +10,7 @@ readme = "README.md"
 license = "MIT OR Apache-2.0"
 repository = "https://framagit.org/adjivas/wiktitrage.git"
 homepage = "https://framagit.org/adjivas/wiktitrage"
-keywords = ["uml", "graph", "dot", "generator", "modeling-language"]
+keywords = ["modeling-language"]
 categories = ["internationalization", "visualization"]
 
 [dependencies]

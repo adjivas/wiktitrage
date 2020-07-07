@@ -150,23 +150,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         // TODO: add default arg b/height
         Ok(_) => {
+            gtk::init().expect("Failed to initialize gtk");
+
             let application = gtk::Application::new(
                 Some(APPLICATION_NAME),
                 gio::ApplicationFlags::empty()
             )
             .expect("Initialization failed...");
 
-            // TODO: wait gtk init
             let clipboard = gtk::Clipboard::get(&gdk::SELECTION_CLIPBOARD);
             let text = clipboard.wait_for_text().expect("Clip wait for text failed");
             let wiks = Resp::new(&text).await?.next().unwrap();
 
             clipboard.set_text(&wiks.first().unwrap().desc);
 
-            // Extracting Etymological Information from Wiktionary --
-            // https://stackoverflow.com/questions/52351081
             application.connect_startup(move |app| {
-                // The CSS "magic" happens here.
                 let css = style::get_style()
                     .unwrap_or_else(|_| String::from(style::APPLICATION_STYLE));
                 let provider = gtk::CssProvider::new();
@@ -174,8 +172,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 provider
                     .load_from_data(css.as_bytes())
                     .expect("Failed to load CSS");
-                // We give the CssProvided to the default screen so the CSS rules we added
-                // can be applied to our window.
                 gtk::StyleContext::add_provider_for_screen(
                     &gdk::Screen::get_default()
                     .expect("Error initializing gtk css provider."),
@@ -183,9 +179,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
                     );
 
-                // We build the application UI.
                 build_ui(app, wiks.clone());
             });
+
+            application.connect_activate(|_| {});
 
             glib::set_application_name("wiktitrage");
             application.run(&args);

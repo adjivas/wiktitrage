@@ -6,12 +6,12 @@ use std::rc::Rc;
 
 use getopts::Options;
 
-use gio::prelude::*;
-use gtk::prelude::*;
+use glib::clone;
+use gdk::keys::constants;
 use gtk::ApplicationWindow;
 use gtk::Justification;
-use gdk::keys::constants;
-use glib::clone;
+use gio::prelude::*;
+use gtk::prelude::*;
 
 pub mod style;
 pub mod request;
@@ -41,8 +41,8 @@ fn build_ui(application: &gtk::Application, wiks: Vec<Wik>) {
     window.connect_screen_changed(set_visual);
     window.connect_draw(draw);
 
-    window.set_default_size(geometry.width, -1);
-    window.move_(0, geometry.height - 200);
+    window.set_default_size(geometry.width, geometry.height/3);
+    window.move_(0, geometry.height - geometry.height/3);
     window.set_title("Wiktitrage");
     window.set_app_paintable(true); // crucial for transparency
 
@@ -88,6 +88,12 @@ fn build_ui(application: &gtk::Application, wiks: Vec<Wik>) {
         label.set_line_wrap(true);
         label.set_lines(3);
         label.set_justify(Justification::Center);
+
+        // How to justify text in center in gtk label -
+        // https://stackoverflow.com/questions/44240338
+        //       /how-to-justify-text-in-center-in-gtk-label-in-c#answer-44246153
+        label.set_vexpand(true);
+        label.set_hexpand(true);
         gtk::WidgetExt::set_widget_name(&label, "label1");
         vbox.add(&label);
         // Then we add the container inside our window.
@@ -122,7 +128,7 @@ fn set_visual(window: &ApplicationWindow, _screen: Option<&gdk::Screen>) {
 
 fn draw(_window: &ApplicationWindow, ctx: &cairo::Context) -> Inhibit {
     // crucial for transparency
-    ctx.set_source_rgba(0.0, 0.0, 0.0, 0.0);
+    ctx.set_source_rgba(255.0, 0.0, 0.0, 0.5);
     ctx.set_operator(cairo::Operator::Screen);
     ctx.paint();
     Inhibit(false)
